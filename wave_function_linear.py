@@ -23,7 +23,126 @@ details = '{\
     "grid_height":10,\
     "dimension":6,\
     "source_road_collection_name":"Modules",\
-    "target_road_collection_name":"Generated"\
+    "target_road_collection_name":"Generated",\
+    "default_piece_configurations": {\
+        "name":"default",\
+        "source_collection_child_name":"Empty",\
+        "x_top":0,\
+        "x_bottom":0,\
+        "y_top":0,\
+        "y_bottom":0,\
+        "piece_rotation":0\
+        },\
+    "road_piece_configurations":[\
+        {\
+        "name":"Straight",\
+        "source_collection_child_name":"Straight",\
+        "x_top":1,\
+        "x_bottom":1,\
+        "y_top":0,\
+        "y_bottom":0,\
+        "piece_rotation":0\
+        },\
+        {\
+        "name":"Straight_90",\
+        "source_collection_child_name":"Straight",\
+        "x_top":0,\
+        "x_bottom":0,\
+        "y_top":1,\
+        "y_bottom":1,\
+        "piece_rotation":90\
+        },\
+        {\
+        "name":"L_turn",\
+        "source_collection_child_name":"L-turn",\
+        "x_top":1,\
+        "x_bottom":0,\
+        "y_top":0,\
+        "y_bottom":1,\
+        "piece_rotation":0\
+        },\
+        {\
+        "name":"L_turn_270",\
+        "source_collection_child_name":"L-turn",\
+        "x_top":0,\
+        "x_bottom":1,\
+        "y_top":0,\
+        "y_bottom":1,\
+        "piece_rotation":270\
+        },\
+        {\
+        "name":"R_turn",\
+        "source_collection_child_name":"R-turn",\
+        "x_top":1,\
+        "x_bottom":0,\
+        "y_top":1,\
+        "y_bottom":0,\
+        "piece_rotation":0\
+        },\
+        {\
+        "name":"R_turn_90",\
+        "source_collection_child_name":"R-turn",\
+        "x_top":0,\
+        "x_bottom":1,\
+        "y_top":1,\
+        "y_bottom":0,\
+        "piece_rotation":90\
+        },\
+        {\
+        "name":"4_way_junction",\
+        "source_collection_child_name":"Plus-joint",\
+        "x_top":1,\
+        "x_bottom":1,\
+        "y_top":1,\
+        "y_bottom":1,\
+        "piece_rotation":0\
+        },\
+        {\
+        "name":"3_way_junction",\
+        "source_collection_child_name":"T-joint",\
+        "x_top":1,\
+        "x_bottom":1,\
+        "y_top":1,\
+        "y_bottom":0,\
+        "piece_rotation":0\
+        },\
+        {\
+        "name":"3_way_junction_90",\
+        "source_collection_child_name":"T-joint",\
+        "x_top":0,\
+        "x_bottom":1,\
+        "y_top":1,\
+        "y_bottom":1,\
+        "piece_rotation":90\
+        },\
+        {\
+        "name":"3_way_junction_180",\
+        "source_collection_child_name":"T-joint",\
+        "x_top":1,\
+        "x_bottom":1,\
+        "y_top":0,\
+        "y_bottom":1,\
+        "piece_rotation":180\
+        },\
+        {\
+        "name":"3_way_junction_270",\
+        "source_collection_child_name":"T-joint",\
+        "x_top":1,\
+        "x_bottom":0,\
+        "y_top":1,\
+        "y_bottom":1,\
+        "piece_rotation":270\
+        },\
+        {\
+        "name":"empty",\
+        "source_collection_child_name":"Empty",\
+        "x_top":0,\
+        "x_bottom":0,\
+        "y_top":0,\
+        "y_bottom":0,\
+        "piece_rotation":0\
+        }\
+    ]\
 }'
 
 details_dict = json.loads(details)
@@ -35,34 +154,30 @@ dimension = details_dict["dimension"]
 target_road_collection = bpy.data.collections[details_dict["target_road_collection_name"]]
 road_modules_collection = bpy.data.collections[details_dict["source_road_collection_name"]]
 
-straight_road_module = road_modules_collection.children['Straight'].objects
-l_turn_road_module = road_modules_collection.children['L-turn'].objects
-r_turn_road_module = road_modules_collection.children['R-turn'].objects
-cross_road_module = road_modules_collection.children['Plus-joint'].objects
-t_road_module = road_modules_collection.children['T-joint'].objects
-empty_module = road_modules_collection.children['Empty'].objects
+# TODO: Will be taken when weights are introduced
 dead_end_module = road_modules_collection.children['Dead-end'].objects
 
-straight_road_piece = Piece('Straight', straight_road_module, (1, 1, 0, 0), 0)
-straight_road_90_piece = Piece(
-    'Straight', straight_road_module, (0, 0, 1, 1), 90)
-l_turn_road_piece = Piece('L-turn', l_turn_road_module, (1, 0, 0, 1), 0)
-l_turn_270_road_piece = Piece('L-turn', l_turn_road_module, (0, 1, 0, 1), 270)
-r_turn_road_piece = Piece('R-turn', r_turn_road_module, (1, 0, 1, 0), 0)
-r_turn_90_road_piece = Piece('R-turn', r_turn_road_module, (0, 1, 1, 0), 90)
-cross_road_piece = Piece('Cross-roads', cross_road_module, (1, 1, 1, 1), 0)
-t_road_piece = Piece('Cross-roads', t_road_module, (1, 1, 1, 0), 0)
-t_road_90_piece = Piece('Cross-roads', t_road_module, (0, 1, 1, 1), 90)
-t_road_180_piece = Piece('Cross-roads', t_road_module, (1, 1, 0, 1), 180)
-t_road_270_piece = Piece('Cross-roads', t_road_module, (1, 0, 1, 1), 270)
-empty = Piece('empty', empty_module, (0, 0, 0, 0), 0)
 dead_end_piece = Piece('Straight', dead_end_module, (1, 0, 0, 0), 0)
 dead_end_90_piece = Piece('Straight', dead_end_module, (0, 0, 1, 0), 90)
 dead_end_180_piece = Piece('Straight', dead_end_module, (0, 1, 0, 0), 180)
 dead_end_270_piece = Piece('Straight', dead_end_module, (0, 0, 0, 1), 270)
 
-modular_pieces = [straight_road_piece, empty, l_turn_road_piece, r_turn_road_piece, cross_road_piece, t_road_piece,
-                  l_turn_270_road_piece, r_turn_90_road_piece, t_road_90_piece, t_road_180_piece, t_road_270_piece, straight_road_90_piece]
+modular_pieces = []
+
+
+def get_piece(configuration):
+    name = configuration["name"]
+    source_pieces = road_modules_collection.children[configuration["source_collection_child_name"]].objects
+    piece_fittings = (
+        configuration["x_top"], configuration["x_bottom"], configuration["y_top"], configuration["y_bottom"])
+    piece_rotation = configuration["piece_rotation"]
+    return Piece(name, source_pieces, piece_fittings, piece_rotation)
+
+
+for configuration in details_dict["road_piece_configurations"]:
+    modular_pieces.append(get_piece(configuration))
+
+default_piece = get_piece(details_dict["default_piece_configurations"])
 
 
 class Cell:
@@ -83,7 +198,7 @@ def update_possibilities(position, cells):
 
     updated_possibilities = []
     piece_cell = cells.get(f'{x+1}-{y}')
-    piece = empty if piece_cell == None else piece_cell.filled_piece
+    piece = default_piece if piece_cell == None else piece_cell.filled_piece
     if piece != None:
         for possible_piece in cell.possibilities:
             if possible_piece.x_top == piece.x_bottom:
@@ -95,7 +210,7 @@ def update_possibilities(position, cells):
 
     updated_possibilities = []
     piece_cell = cells.get(f'{x-1}-{y}')
-    piece = empty if piece_cell == None else piece_cell.filled_piece
+    piece = default_piece if piece_cell == None else piece_cell.filled_piece
     if piece != None:
         for possible_piece in cell.possibilities:
             if possible_piece.x_bottom == piece.x_top:
@@ -107,7 +222,7 @@ def update_possibilities(position, cells):
 
     updated_possibilities = []
     piece_cell = cells.get(f'{x}-{y+1}')
-    piece = empty if piece_cell == None else piece_cell.filled_piece
+    piece = default_piece if piece_cell == None else piece_cell.filled_piece
     if piece != None:
         for possible_piece in cell.possibilities:
             if possible_piece.y_top == piece.y_bottom:
@@ -119,7 +234,7 @@ def update_possibilities(position, cells):
 
     updated_possibilities = []
     piece_cell = cells.get(f'{x}-{y-1}')
-    piece = empty if piece_cell == None else piece_cell.filled_piece
+    piece = default_piece if piece_cell == None else piece_cell.filled_piece
     if piece != None:
         for possible_piece in cell.possibilities:
             if possible_piece.y_bottom == piece.y_top:
