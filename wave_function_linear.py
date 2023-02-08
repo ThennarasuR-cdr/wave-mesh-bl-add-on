@@ -18,13 +18,13 @@ class Piece:
 
 cells = {}
 
-target_road_collection = bpy.data.collections['Generated']
-road_modules_collection = bpy.data.collections['Modules']
-
 details = '{\
-"grid_width":10,\
-"grid_height":10,\
-"dimension":6}'
+    "grid_width":10,\
+    "grid_height":10,\
+    "dimension":6,\
+    "source_road_collection_name":"Modules",\
+    "target_road_collection_name":"Generated"\
+}'
 
 details_dict = json.loads(details)
 
@@ -32,6 +32,8 @@ width = details_dict["grid_width"]
 height = details_dict["grid_height"]
 dimension = details_dict["dimension"]
 
+target_road_collection = bpy.data.collections[details_dict["target_road_collection_name"]]
+road_modules_collection = bpy.data.collections[details_dict["source_road_collection_name"]]
 
 straight_road_module = road_modules_collection.children['Straight'].objects
 l_turn_road_module = road_modules_collection.children['L-turn'].objects
