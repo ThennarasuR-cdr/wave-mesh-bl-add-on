@@ -23,15 +23,6 @@ details_dict = {
     "dimension": 6,
     "source_road_collection_name": "Modules",
     "target_road_collection_name": "Generated",
-    "default_piece_configurations": {
-        "name": "default",
-        "source_collection_child_name": "Empty",
-        "x_top": 0,
-        "x_bottom": 0,
-        "y_top": 0,
-        "y_bottom": 0,
-        "piece_rotation": 0
-    },
 }
 
 width = details_dict["grid_width"]
@@ -50,6 +41,7 @@ dead_end_180_piece = Piece('Straight', dead_end_module, (0, 1, 0, 0), 180)
 dead_end_270_piece = Piece('Straight', dead_end_module, (0, 0, 0, 1), 270)
 
 modular_pieces = []
+default_piece = None
 
 
 def get_piece(configuration):
@@ -65,10 +57,12 @@ for child in road_modules_collection.children:
     for key in child.keys():
         if key.startswith("WF"):
             values = child[key]
-            modular_pieces.append(get_piece(
-                {"name": key, "source_collection_child_name": child.name, "x_top": values[0], "x_bottom": values[1], "y_top": values[2], "y_bottom": values[3], "piece_rotation": values[4]}))
-
-default_piece = get_piece(details_dict["default_piece_configurations"])
+            piece = get_piece(
+                {"name": key, "source_collection_child_name": child.name, "x_top": values[0], "x_bottom": values[1], "y_top": values[2], "y_bottom": values[3], "piece_rotation": values[4]})
+            modular_pieces.append(piece)
+            if key.startswith("WF_default"):
+                default_piece = piece
+# TODO: Handle error if default piece is None
 
 
 class Cell:
