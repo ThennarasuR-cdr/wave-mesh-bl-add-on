@@ -32,116 +32,6 @@ details_dict = {
         "y_bottom": 0,
         "piece_rotation": 0
     },
-    "road_piece_configurations": [
-        {
-            "name": "Straight",
-            "source_collection_child_name": "Straight",
-            "x_top": 1,
-            "x_bottom": 1,
-            "y_top": 0,
-            "y_bottom": 0,
-            "piece_rotation": 0
-        },
-        {
-            "name": "Straight_90",
-            "source_collection_child_name": "Straight",
-            "x_top": 0,
-            "x_bottom": 0,
-            "y_top": 1,
-            "y_bottom": 1,
-            "piece_rotation": 90
-        },
-        {
-            "name": "L_turn",
-            "source_collection_child_name": "L-turn",
-            "x_top": 1,
-            "x_bottom": 0,
-            "y_top": 0,
-            "y_bottom": 1,
-            "piece_rotation": 0
-        },
-        {
-            "name": "L_turn_270",
-            "source_collection_child_name": "L-turn",
-            "x_top": 0,
-            "x_bottom": 1,
-            "y_top": 0,
-            "y_bottom": 1,
-            "piece_rotation": 270
-        },
-        {
-            "name": "R_turn",
-            "source_collection_child_name": "R-turn",
-            "x_top": 1,
-            "x_bottom": 0,
-            "y_top": 1,
-            "y_bottom": 0,
-            "piece_rotation": 0
-        },
-        {
-            "name": "R_turn_90",
-            "source_collection_child_name": "R-turn",
-            "x_top": 0,
-            "x_bottom": 1,
-            "y_top": 1,
-            "y_bottom": 0,
-            "piece_rotation": 90
-        },
-        {
-            "name": "4_way_junction",
-            "source_collection_child_name": "Plus-joint",
-            "x_top": 1,
-            "x_bottom": 1,
-            "y_top": 1,
-            "y_bottom": 1,
-            "piece_rotation": 0
-        },
-        {
-            "name": "3_way_junction",
-            "source_collection_child_name": "T-joint",
-            "x_top": 1,
-            "x_bottom": 1,
-            "y_top": 1,
-            "y_bottom": 0,
-            "piece_rotation": 0
-        },
-        {
-            "name": "3_way_junction_90",
-            "source_collection_child_name": "T-joint",
-            "x_top": 0,
-            "x_bottom": 1,
-            "y_top": 1,
-            "y_bottom": 1,
-            "piece_rotation": 90
-        },
-        {
-            "name": "3_way_junction_180",
-            "source_collection_child_name": "T-joint",
-            "x_top": 1,
-            "x_bottom": 1,
-            "y_top": 0,
-            "y_bottom": 1,
-            "piece_rotation": 180
-        },
-        {
-            "name": "3_way_junction_270",
-            "source_collection_child_name": "T-joint",
-            "x_top": 1,
-            "x_bottom": 0,
-            "y_top": 1,
-            "y_bottom": 1,
-            "piece_rotation": 270
-        },
-        {
-            "name": "empty",
-            "source_collection_child_name": "Empty",
-            "x_top": 0,
-            "x_bottom": 0,
-            "y_top": 0,
-            "y_bottom": 0,
-            "piece_rotation": 0
-        }
-    ]
 }
 
 width = details_dict["grid_width"]
@@ -171,8 +61,12 @@ def get_piece(configuration):
     return Piece(name, source_pieces, piece_fittings, piece_rotation)
 
 
-for configuration in details_dict["road_piece_configurations"]:
-    modular_pieces.append(get_piece(configuration))
+for child in road_modules_collection.children:
+    for key in child.keys():
+        if key.startswith("WF"):
+            values = child[key]
+            modular_pieces.append(get_piece(
+                {"name": key, "source_collection_child_name": child.name, "x_top": values[0], "x_bottom": values[1], "y_top": values[2], "y_bottom": values[3], "piece_rotation": values[4]}))
 
 default_piece = get_piece(details_dict["default_piece_configurations"])
 
