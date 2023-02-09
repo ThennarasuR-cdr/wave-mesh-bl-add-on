@@ -1,7 +1,6 @@
 import random
 import bpy
 from math import radians
-import json
 
 
 class Piece:
@@ -18,134 +17,132 @@ class Piece:
 
 cells = {}
 
-details = '{\
-    "grid_width":10,\
-    "grid_height":10,\
-    "dimension":6,\
-    "source_road_collection_name":"Modules",\
-    "target_road_collection_name":"Generated",\
-    "default_piece_configurations": {\
-        "name":"default",\
-        "source_collection_child_name":"Empty",\
-        "x_top":0,\
-        "x_bottom":0,\
-        "y_top":0,\
-        "y_bottom":0,\
-        "piece_rotation":0\
-        },\
-    "road_piece_configurations":[\
-        {\
-        "name":"Straight",\
-        "source_collection_child_name":"Straight",\
-        "x_top":1,\
-        "x_bottom":1,\
-        "y_top":0,\
-        "y_bottom":0,\
-        "piece_rotation":0\
-        },\
-        {\
-        "name":"Straight_90",\
-        "source_collection_child_name":"Straight",\
-        "x_top":0,\
-        "x_bottom":0,\
-        "y_top":1,\
-        "y_bottom":1,\
-        "piece_rotation":90\
-        },\
-        {\
-        "name":"L_turn",\
-        "source_collection_child_name":"L-turn",\
-        "x_top":1,\
-        "x_bottom":0,\
-        "y_top":0,\
-        "y_bottom":1,\
-        "piece_rotation":0\
-        },\
-        {\
-        "name":"L_turn_270",\
-        "source_collection_child_name":"L-turn",\
-        "x_top":0,\
-        "x_bottom":1,\
-        "y_top":0,\
-        "y_bottom":1,\
-        "piece_rotation":270\
-        },\
-        {\
-        "name":"R_turn",\
-        "source_collection_child_name":"R-turn",\
-        "x_top":1,\
-        "x_bottom":0,\
-        "y_top":1,\
-        "y_bottom":0,\
-        "piece_rotation":0\
-        },\
-        {\
-        "name":"R_turn_90",\
-        "source_collection_child_name":"R-turn",\
-        "x_top":0,\
-        "x_bottom":1,\
-        "y_top":1,\
-        "y_bottom":0,\
-        "piece_rotation":90\
-        },\
-        {\
-        "name":"4_way_junction",\
-        "source_collection_child_name":"Plus-joint",\
-        "x_top":1,\
-        "x_bottom":1,\
-        "y_top":1,\
-        "y_bottom":1,\
-        "piece_rotation":0\
-        },\
-        {\
-        "name":"3_way_junction",\
-        "source_collection_child_name":"T-joint",\
-        "x_top":1,\
-        "x_bottom":1,\
-        "y_top":1,\
-        "y_bottom":0,\
-        "piece_rotation":0\
-        },\
-        {\
-        "name":"3_way_junction_90",\
-        "source_collection_child_name":"T-joint",\
-        "x_top":0,\
-        "x_bottom":1,\
-        "y_top":1,\
-        "y_bottom":1,\
-        "piece_rotation":90\
-        },\
-        {\
-        "name":"3_way_junction_180",\
-        "source_collection_child_name":"T-joint",\
-        "x_top":1,\
-        "x_bottom":1,\
-        "y_top":0,\
-        "y_bottom":1,\
-        "piece_rotation":180\
-        },\
-        {\
-        "name":"3_way_junction_270",\
-        "source_collection_child_name":"T-joint",\
-        "x_top":1,\
-        "x_bottom":0,\
-        "y_top":1,\
-        "y_bottom":1,\
-        "piece_rotation":270\
-        },\
-        {\
-        "name":"empty",\
-        "source_collection_child_name":"Empty",\
-        "x_top":0,\
-        "x_bottom":0,\
-        "y_top":0,\
-        "y_bottom":0,\
-        "piece_rotation":0\
-        }\
-    ]\
-}'
-
-details_dict = json.loads(details)
+details_dict = {
+    "grid_width": 10,
+    "grid_height": 10,
+    "dimension": 6,
+    "source_road_collection_name": "Modules",
+    "target_road_collection_name": "Generated",
+    "default_piece_configurations": {
+        "name": "default",
+        "source_collection_child_name": "Empty",
+        "x_top": 0,
+        "x_bottom": 0,
+        "y_top": 0,
+        "y_bottom": 0,
+        "piece_rotation": 0
+    },
+    "road_piece_configurations": [
+        {
+            "name": "Straight",
+            "source_collection_child_name": "Straight",
+            "x_top": 1,
+            "x_bottom": 1,
+            "y_top": 0,
+            "y_bottom": 0,
+            "piece_rotation": 0
+        },
+        {
+            "name": "Straight_90",
+            "source_collection_child_name": "Straight",
+            "x_top": 0,
+            "x_bottom": 0,
+            "y_top": 1,
+            "y_bottom": 1,
+            "piece_rotation": 90
+        },
+        {
+            "name": "L_turn",
+            "source_collection_child_name": "L-turn",
+            "x_top": 1,
+            "x_bottom": 0,
+            "y_top": 0,
+            "y_bottom": 1,
+            "piece_rotation": 0
+        },
+        {
+            "name": "L_turn_270",
+            "source_collection_child_name": "L-turn",
+            "x_top": 0,
+            "x_bottom": 1,
+            "y_top": 0,
+            "y_bottom": 1,
+            "piece_rotation": 270
+        },
+        {
+            "name": "R_turn",
+            "source_collection_child_name": "R-turn",
+            "x_top": 1,
+            "x_bottom": 0,
+            "y_top": 1,
+            "y_bottom": 0,
+            "piece_rotation": 0
+        },
+        {
+            "name": "R_turn_90",
+            "source_collection_child_name": "R-turn",
+            "x_top": 0,
+            "x_bottom": 1,
+            "y_top": 1,
+            "y_bottom": 0,
+            "piece_rotation": 90
+        },
+        {
+            "name": "4_way_junction",
+            "source_collection_child_name": "Plus-joint",
+            "x_top": 1,
+            "x_bottom": 1,
+            "y_top": 1,
+            "y_bottom": 1,
+            "piece_rotation": 0
+        },
+        {
+            "name": "3_way_junction",
+            "source_collection_child_name": "T-joint",
+            "x_top": 1,
+            "x_bottom": 1,
+            "y_top": 1,
+            "y_bottom": 0,
+            "piece_rotation": 0
+        },
+        {
+            "name": "3_way_junction_90",
+            "source_collection_child_name": "T-joint",
+            "x_top": 0,
+            "x_bottom": 1,
+            "y_top": 1,
+            "y_bottom": 1,
+            "piece_rotation": 90
+        },
+        {
+            "name": "3_way_junction_180",
+            "source_collection_child_name": "T-joint",
+            "x_top": 1,
+            "x_bottom": 1,
+            "y_top": 0,
+            "y_bottom": 1,
+            "piece_rotation": 180
+        },
+        {
+            "name": "3_way_junction_270",
+            "source_collection_child_name": "T-joint",
+            "x_top": 1,
+            "x_bottom": 0,
+            "y_top": 1,
+            "y_bottom": 1,
+            "piece_rotation": 270
+        },
+        {
+            "name": "empty",
+            "source_collection_child_name": "Empty",
+            "x_top": 0,
+            "x_bottom": 0,
+            "y_top": 0,
+            "y_bottom": 0,
+            "piece_rotation": 0
+        }
+    ]
+}
 
 width = details_dict["grid_width"]
 height = details_dict["grid_height"]
