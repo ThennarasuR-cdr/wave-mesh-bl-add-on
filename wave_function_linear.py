@@ -2,21 +2,11 @@ import random
 import bpy
 from math import radians
 
-
-details_dict = {
-    "grid_width": 10,
-    "grid_height": 10,
-    "dimension": 6,
-    "source_road_collection_name": "Modules",
-    "target_road_collection_name": "Generated",
-}
-
-width = details_dict["grid_width"]
-height = details_dict["grid_height"]
-dimension = details_dict["dimension"]
-
-target_road_collection = bpy.data.collections[details_dict["target_road_collection_name"]]
-road_modules_collection = bpy.data.collections[details_dict["source_road_collection_name"]]
+width = None
+height = None
+dimension = None
+target_collection = None
+source_modules_collection = None
 
 default_piece = None
 
@@ -38,14 +28,14 @@ def initialize_grids():
 
     def get_piece(configuration):
         name = configuration["name"]
-        source_pieces = road_modules_collection.children[
+        source_pieces = source_modules_collection.children[
             configuration["source_collection_child_name"]].objects
         piece_fittings = (
             configuration["x_top"], configuration["x_bottom"], configuration["y_top"], configuration["y_bottom"])
         piece_rotation = configuration["piece_rotation"]
         return Piece(name, source_pieces, piece_fittings, piece_rotation)
 
-    for child in road_modules_collection.children:
+    for child in source_modules_collection.children:
         for key in child.keys():
             if key.startswith("WF"):
                 values = child[key]
@@ -105,7 +95,7 @@ def add_piece(position, cells):
     piece = cell.possibilities[random.randint(0, len(cell.possibilities)-1)]
     piece_to_be_spawned = piece.piece[random.randint(0, len(piece.piece)-1)]
     piece_copy = piece_to_be_spawned.copy()
-    target_road_collection.objects.link(piece_copy)
+    target_collection.objects.link(piece_copy)
     piece_copy.location = (x*dimension, y*dimension, 0)
     piece_copy.rotation_euler = (0, 0, radians(piece.rotation))
     cell.filled_piece = piece
@@ -113,8 +103,8 @@ def add_piece(position, cells):
 
 
 def insert_piece(cells):
-    for y_index in range(0, width):
-        for x_index in range(0, height):
+    for x_index in range(0, width):
+        for y_index in range(0, height):
             cells = update_possibilities((x_index, y_index), cells)
             cells = add_piece((x_index, y_index), cells)
 
@@ -122,6 +112,17 @@ def insert_piece(cells):
 def generate():
     cells = initialize_grids()
     insert_piece(cells)
+
+
+class ProMeshProperties(bpy.types.PropertyGroup):
+    width: bpy.props.IntProperty(name="Width", default=10)
+    depth: bpy.props.IntProperty(name="Depth", default=10)
+    dimension_of_pieces: bpy.props.IntProperty(
+        name="Piece Dimension", default=6)
+    target_collection_name: bpy.props.StringProperty(
+        name="Target Collection name", default="Generated")
+    source_collection_name: bpy.props.StringProperty(
+        name="Source Collection name", default="Modules")
 
 
 class WFMeshGeneratorUI(bpy.types.Panel):
@@ -132,7 +133,16 @@ class WFMeshGeneratorUI(bpy.types.Panel):
     bl_category = "ProMesh"
 
     def draw(self, context):
+        scene = context.scene
+        properties = scene.pro_mesh_pointer_prop
+
         layout = self.layout
+
+        layout.prop(properties, "width")
+        layout.prop(properties, "depth")
+        layout.prop(properties, "dimension_of_pieces")
+        layout.prop(properties, "source_collection_name")
+        layout.prop(properties, "target_collection_name")
 
         generator_row = layout.row()
         generator_row.operator("mesh.wf_procedural_mesh_generator")
@@ -143,18 +153,35 @@ class GenerateRandomMeshWFOperator(bpy.types.Operator):
     bl_label = "Generate"
 
     def execute(self, context):
+        scene = context.scene
+        properties = scene.pro_mesh_pointer_prop
+
+        global width, height, dimension, target_collection, source_modules_collection
+        width = properties.width
+        height = properties.depth
+        dimension = properties.dimension_of_pieces
+        target_collection = bpy.data.collections[properties.target_collection_name]
+        source_modules_collection = bpy.data.collections[properties.source_collection_name]
+
         generate()
         return {'FINISHED'}
 
 
 def register():
+    bpy.utils.register_class(ProMeshProperties)
     bpy.utils.register_class(GenerateRandomMeshWFOperator)
     bpy.utils.register_class(WFMeshGeneratorUI)
 
+    bpy.types.Scene.pro_mesh_pointer_prop = bpy.props.PointerProperty(
+        type=ProMeshProperties)
+
 
 def unregister():
+    bpy.utils.unregister_class(ProMeshProperties)
     bpy.utils.unregister_class(GenerateRandomMeshWFOperator)
     bpy.utils.unregister_class(WFMeshGeneratorUI)
+
+    del bpy.types.Scene.pro_mesh_pointer_prop
 
 
 # TODO: Remove it later
