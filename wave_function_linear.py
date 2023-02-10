@@ -4,6 +4,7 @@ from math import radians
 
 width = None
 height = None
+depth = None
 dimension = None
 target_collection = None
 source_modules_collection = None
@@ -14,13 +15,15 @@ default_piece = None
 def initialize_grids():
     class Piece:
         def __init__(self, name, piece, fittings, rotation):
-            x_top, x_bottom, y_top, y_bottom = fittings
+            x_top, x_bottom, y_top, y_bottom, z_top, z_bottom = fittings
             self.name = name
             self.piece = piece
             self.x_top = x_top
             self.x_bottom = x_bottom
             self.y_top = y_top
             self.y_bottom = y_bottom
+            self.z_top = z_top
+            self.z_bottom = z_bottom
             self.rotation = rotation
 
     cells = {}
@@ -31,7 +34,7 @@ def initialize_grids():
         source_pieces = source_modules_collection.children[
             configuration["source_collection_child_name"]].objects
         piece_fittings = (
-            configuration["x_top"], configuration["x_bottom"], configuration["y_top"], configuration["y_bottom"])
+            configuration["x_top"], configuration["x_bottom"], configuration["y_top"], configuration["y_bottom"], configuration["z_top"], configuration["z_bottom"])
         piece_rotation = configuration["piece_rotation"]
         return Piece(name, source_pieces, piece_fittings, piece_rotation)
 
@@ -40,7 +43,7 @@ def initialize_grids():
             if key.startswith("WF"):
                 values = child[key]
                 piece = get_piece(
-                    {"name": key, "source_collection_child_name": child.name, "x_top": values[0], "x_bottom": values[1], "y_top": values[2], "y_bottom": values[3], "piece_rotation": values[4]})
+                    {"name": key, "source_collection_child_name": child.name, "x_top": values[0], "x_bottom": values[1], "y_top": values[2], "y_bottom": values[3], "z_top": values[4], "z_bottom": values[5], "piece_rotation": values[6]})
                 modular_pieces.append(piece)
                 if key.startswith("WF_default"):
                     global default_piece
@@ -54,18 +57,19 @@ def initialize_grids():
 
     for x_index in range(0, width):
         for y_index in range(0, height):
-            cells.update({f'{x_index}-{y_index}': Cell()})
+            for z_index in range(0, depth):
+                cells.update({f'{x_index}-{y_index}-{z_index}': Cell()})
 
     return cells
 
 
 def update_possibilities(position, cells):
-    x, y = position
-    cell = cells.get(f'{x}-{y}')
+    x, y, z = position
+    cell = cells.get(f'{x}-{y}-{z}')
 
-    def update_possibilities_for_neighbor(x_position, y_position, current_cell, cells, neighbor_position):
+    def update_possibilities_for_neighbor(x_position, y_position, z_position, current_cell, cells, neighbor_position):
         updated_possibilities = []
-        piece_cell = cells.get(f'{x_position}-{y_position}')
+        piece_cell = cells.get(f'{x_position}-{y_position}-{z_position}')
         piece = default_piece if piece_cell == None else piece_cell.filled_piece
         if piece != None:
             for possible_piece in current_cell.possibilities:
@@ -77,26 +81,32 @@ def update_possibilities(position, cells):
                     updated_possibilities.append(possible_piece)
                 if neighbor_position == "0,-1" and possible_piece.y_bottom == piece.y_top:
                     updated_possibilities.append(possible_piece)
+                if neighbor_position == "+z" and possible_piece.z_top == piece.z_bottom:
+                    updated_possibilities.append(possible_piece)
+                if neighbor_position == "-z" and possible_piece.z_bottom == piece.z_top:
+                    updated_possibilities.append(possible_piece)
         if len(updated_possibilities) != 0:
             current_cell.possibilities = updated_possibilities
         return cells
 
-    cells = update_possibilities_for_neighbor(x+1, y, cell, cells, "1,0")
-    cells = update_possibilities_for_neighbor(x-1, y, cell, cells, "-1,0")
-    cells = update_possibilities_for_neighbor(x, y+1, cell, cells, "0,1")
-    cells = update_possibilities_for_neighbor(x, y-1, cell, cells, "0,-1")
+    cells = update_possibilities_for_neighbor(x+1, y, z, cell, cells, "1,0")
+    cells = update_possibilities_for_neighbor(x-1, y, z, cell, cells, "-1,0")
+    cells = update_possibilities_for_neighbor(x, y+1, z, cell, cells, "0,1")
+    cells = update_possibilities_for_neighbor(x, y-1, z, cell, cells, "0,-1")
+    cells = update_possibilities_for_neighbor(x, y, z+1, cell, cells, "+z")
+    cells = update_possibilities_for_neighbor(x, y, z-1, cell, cells, "-z")
 
     return cells
 
 
 def add_piece(position, cells):
-    x, y = position
-    cell = cells.get(f'{x}-{y}')
+    x, y, z = position
+    cell = cells.get(f'{x}-{y}-{z}')
     piece = cell.possibilities[random.randint(0, len(cell.possibilities)-1)]
     piece_to_be_spawned = piece.piece[random.randint(0, len(piece.piece)-1)]
     piece_copy = piece_to_be_spawned.copy()
     target_collection.objects.link(piece_copy)
-    piece_copy.location = (x*dimension, y*dimension, 0)
+    piece_copy.location = (x*dimension, y*dimension, z*dimension)
     piece_copy.rotation_euler = (0, 0, radians(piece.rotation))
     cell.filled_piece = piece
     return cells
@@ -105,8 +115,10 @@ def add_piece(position, cells):
 def insert_piece(cells):
     for x_index in range(0, width):
         for y_index in range(0, height):
-            cells = update_possibilities((x_index, y_index), cells)
-            cells = add_piece((x_index, y_index), cells)
+            for z_index in range(0, depth):
+                cells = update_possibilities(
+                    (x_index, y_index, z_index), cells)
+                cells = add_piece((x_index, y_index, z_index), cells)
 
 
 def generate():
@@ -115,14 +127,15 @@ def generate():
 
 
 class ProMeshProperties(bpy.types.PropertyGroup):
-    width: bpy.props.IntProperty(name="Width", default=10)
-    depth: bpy.props.IntProperty(name="Depth", default=10)
+    width: bpy.props.IntProperty(name="Width (x)", default=10)
+    depth: bpy.props.IntProperty(name="Depth (y)", default=10)
+    height: bpy.props.IntProperty(name="height (z)", default=1)
     dimension_of_pieces: bpy.props.IntProperty(
         name="Piece Dimension", default=6)
     target_collection_name: bpy.props.StringProperty(
-        name="Target Collection name", default="Generated")
+        name="", default="Generated")
     source_collection_name: bpy.props.StringProperty(
-        name="Source Collection name", default="Modules")
+        name="", default="Modules")
 
 
 class WFMeshGeneratorUI(bpy.types.Panel):
@@ -140,8 +153,11 @@ class WFMeshGeneratorUI(bpy.types.Panel):
 
         layout.prop(properties, "width")
         layout.prop(properties, "depth")
+        layout.prop(properties, "height")
         layout.prop(properties, "dimension_of_pieces")
+        layout.label(text="Source Collection name")
         layout.prop(properties, "source_collection_name")
+        layout.label(text="Target Collection name")
         layout.prop(properties, "target_collection_name")
 
         generator_row = layout.row()
@@ -156,9 +172,10 @@ class GenerateRandomMeshWFOperator(bpy.types.Operator):
         scene = context.scene
         properties = scene.pro_mesh_pointer_prop
 
-        global width, height, dimension, target_collection, source_modules_collection
+        global width, height, depth, dimension, target_collection, source_modules_collection
         width = properties.width
         height = properties.depth
+        depth = properties.height
         dimension = properties.dimension_of_pieces
         target_collection = bpy.data.collections[properties.target_collection_name]
         source_modules_collection = bpy.data.collections[properties.source_collection_name]
