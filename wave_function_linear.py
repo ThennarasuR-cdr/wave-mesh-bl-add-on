@@ -119,5 +119,46 @@ def insert_piece(cells):
             cells = add_piece((x_index, y_index), cells)
 
 
-cells = initialize_grids()
-insert_piece(cells)
+def generate():
+    cells = initialize_grids()
+    insert_piece(cells)
+
+
+class WFMeshGeneratorUI(bpy.types.Panel):
+    bl_label = "Procedural Mesh"
+    bl_idname = "pro_mesh_ui"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "ProMesh"
+
+    def draw(self, context):
+        layout = self.layout
+
+        generator_row = layout.row()
+        generator_row.operator("mesh.wf_procedural_mesh_generator")
+
+
+class GenerateRandomMeshWFOperator(bpy.types.Operator):
+    bl_idname = "mesh.wf_procedural_mesh_generator"
+    bl_label = "Generate"
+
+    def execute(self, context):
+        generate()
+        return {'FINISHED'}
+
+
+def register():
+    bpy.utils.register_class(GenerateRandomMeshWFOperator)
+    bpy.utils.register_class(WFMeshGeneratorUI)
+
+
+def unregister():
+    bpy.utils.unregister_class(GenerateRandomMeshWFOperator)
+    bpy.utils.unregister_class(WFMeshGeneratorUI)
+
+
+# TODO: Remove it later
+register()
+
+# if __name__ == "__main__":
+#    register()
