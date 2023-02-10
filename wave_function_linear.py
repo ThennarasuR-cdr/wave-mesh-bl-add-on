@@ -3,20 +3,6 @@ import bpy
 from math import radians
 
 
-class Piece:
-    def __init__(self, name, piece, fittings, rotation):
-        x_top, x_bottom, y_top, y_bottom = fittings
-        self.name = name
-        self.piece = piece
-        self.x_top = x_top
-        self.x_bottom = x_bottom
-        self.y_top = y_top
-        self.y_bottom = y_bottom
-        self.rotation = rotation
-
-
-cells = {}
-
 details_dict = {
     "grid_width": 10,
     "grid_height": 10,
@@ -32,49 +18,56 @@ dimension = details_dict["dimension"]
 target_road_collection = bpy.data.collections[details_dict["target_road_collection_name"]]
 road_modules_collection = bpy.data.collections[details_dict["source_road_collection_name"]]
 
-# TODO: Will be taken when weights are introduced
-dead_end_module = road_modules_collection.children['Dead-end'].objects
-
-dead_end_piece = Piece('Straight', dead_end_module, (1, 0, 0, 0), 0)
-dead_end_90_piece = Piece('Straight', dead_end_module, (0, 0, 1, 0), 90)
-dead_end_180_piece = Piece('Straight', dead_end_module, (0, 1, 0, 0), 180)
-dead_end_270_piece = Piece('Straight', dead_end_module, (0, 0, 0, 1), 270)
-
-modular_pieces = []
 default_piece = None
 
 
-def get_piece(configuration):
-    name = configuration["name"]
-    source_pieces = road_modules_collection.children[configuration["source_collection_child_name"]].objects
-    piece_fittings = (
-        configuration["x_top"], configuration["x_bottom"], configuration["y_top"], configuration["y_bottom"])
-    piece_rotation = configuration["piece_rotation"]
-    return Piece(name, source_pieces, piece_fittings, piece_rotation)
+def initialize_grids():
+    class Piece:
+        def __init__(self, name, piece, fittings, rotation):
+            x_top, x_bottom, y_top, y_bottom = fittings
+            self.name = name
+            self.piece = piece
+            self.x_top = x_top
+            self.x_bottom = x_bottom
+            self.y_top = y_top
+            self.y_bottom = y_bottom
+            self.rotation = rotation
 
+    cells = {}
+    modular_pieces = []
 
-for child in road_modules_collection.children:
-    for key in child.keys():
-        if key.startswith("WF"):
-            values = child[key]
-            piece = get_piece(
-                {"name": key, "source_collection_child_name": child.name, "x_top": values[0], "x_bottom": values[1], "y_top": values[2], "y_bottom": values[3], "piece_rotation": values[4]})
-            modular_pieces.append(piece)
-            if key.startswith("WF_default"):
-                default_piece = piece
-# TODO: Handle error if default piece is None
+    def get_piece(configuration):
+        name = configuration["name"]
+        source_pieces = road_modules_collection.children[
+            configuration["source_collection_child_name"]].objects
+        piece_fittings = (
+            configuration["x_top"], configuration["x_bottom"], configuration["y_top"], configuration["y_bottom"])
+        piece_rotation = configuration["piece_rotation"]
+        return Piece(name, source_pieces, piece_fittings, piece_rotation)
 
+    for child in road_modules_collection.children:
+        for key in child.keys():
+            if key.startswith("WF"):
+                values = child[key]
+                piece = get_piece(
+                    {"name": key, "source_collection_child_name": child.name, "x_top": values[0], "x_bottom": values[1], "y_top": values[2], "y_bottom": values[3], "piece_rotation": values[4]})
+                modular_pieces.append(piece)
+                if key.startswith("WF_default"):
+                    global default_piece
+                    default_piece = piece
+    # TODO: Handle error if default piece is None
 
-class Cell:
-    def __init__(self):
-        self.possibilities = modular_pieces
-        self.is_filled = False
-        self.filled_piece = None
+    class Cell:
+        def __init__(self):
+            self.possibilities = modular_pieces
+            self.is_filled = False
+            self.filled_piece = None
 
+    for x_index in range(0, width):
+        for y_index in range(0, height):
+            cells.update({f'{x_index}-{y_index}': Cell()})
 
-for x_index in range(0, width):
-    for y_index in range(0, height):
-        cells.update({f'{x_index}-{y_index}': Cell()})
+    return cells
 
 
 def update_possibilities(position, cells):
@@ -129,6 +122,8 @@ def update_possibilities(position, cells):
     if len(updated_possibilities) != 0:
         cell.possibilities = updated_possibilities
 
+    return cells
+
 
 def add_piece(position, cells):
     x, y = position
@@ -140,13 +135,15 @@ def add_piece(position, cells):
     piece_copy.location = (x*dimension, y*dimension, 0)
     piece_copy.rotation_euler = (0, 0, radians(piece.rotation))
     cell.filled_piece = piece
+    return cells
 
 
-def insert_piece():
+def insert_piece(cells):
     for y_index in range(0, width):
         for x_index in range(0, height):
-            update_possibilities((x_index, y_index), cells)
-            add_piece((x_index, y_index), cells)
+            cells = update_possibilities((x_index, y_index), cells)
+            cells = add_piece((x_index, y_index), cells)
 
 
-insert_piece()
+cells = initialize_grids()
+insert_piece(cells)
