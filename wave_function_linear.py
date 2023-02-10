@@ -55,7 +55,6 @@ def initialize_grids():
                 if key.startswith("WF_default"):
                     global default_piece
                     default_piece = piece
-    # TODO: Handle error if default piece is None
 
     class Cell:
         def __init__(self):
@@ -74,53 +73,28 @@ def update_possibilities(position, cells):
     x, y = position
     cell = cells.get(f'{x}-{y}')
 
-    updated_possibilities = []
-    piece_cell = cells.get(f'{x+1}-{y}')
-    piece = default_piece if piece_cell == None else piece_cell.filled_piece
-    if piece != None:
-        for possible_piece in cell.possibilities:
-            if possible_piece.x_top == piece.x_bottom:
-                print("1, x_top, x_bottom", possible_piece.x_top,
-                      piece.x_bottom, possible_piece.name, piece.name)
-                updated_possibilities.append(possible_piece)
-    if len(updated_possibilities) != 0:
-        cell.possibilities = updated_possibilities
+    def update_possibilities_for_neighbor(x_position, y_position, current_cell, cells, neighbor_position):
+        updated_possibilities = []
+        piece_cell = cells.get(f'{x_position}-{y_position}')
+        piece = default_piece if piece_cell == None else piece_cell.filled_piece
+        if piece != None:
+            for possible_piece in current_cell.possibilities:
+                if neighbor_position == "1,0" and possible_piece.x_top == piece.x_bottom:
+                    updated_possibilities.append(possible_piece)
+                if neighbor_position == "-1,0" and possible_piece.x_bottom == piece.x_top:
+                    updated_possibilities.append(possible_piece)
+                if neighbor_position == "0,1" and possible_piece.y_top == piece.y_bottom:
+                    updated_possibilities.append(possible_piece)
+                if neighbor_position == "0,-1" and possible_piece.y_bottom == piece.y_top:
+                    updated_possibilities.append(possible_piece)
+        if len(updated_possibilities) != 0:
+            current_cell.possibilities = updated_possibilities
+        return cells
 
-    updated_possibilities = []
-    piece_cell = cells.get(f'{x-1}-{y}')
-    piece = default_piece if piece_cell == None else piece_cell.filled_piece
-    if piece != None:
-        for possible_piece in cell.possibilities:
-            if possible_piece.x_bottom == piece.x_top:
-                print(f"2, {x-1}-{y}, x_bottom, x_top", possible_piece.x_bottom,
-                      piece.x_top, possible_piece.name, piece.name)
-                updated_possibilities.append(possible_piece)
-    if len(updated_possibilities) != 0:
-        cell.possibilities = updated_possibilities
-
-    updated_possibilities = []
-    piece_cell = cells.get(f'{x}-{y+1}')
-    piece = default_piece if piece_cell == None else piece_cell.filled_piece
-    if piece != None:
-        for possible_piece in cell.possibilities:
-            if possible_piece.y_top == piece.y_bottom:
-                print(f"3, {x}-{y+1}, y_top, y_bottom", possible_piece.y_top,
-                      piece.y_bottom, possible_piece.name, piece.name)
-                updated_possibilities.append(possible_piece)
-    if len(updated_possibilities) != 0:
-        cell.possibilities = updated_possibilities
-
-    updated_possibilities = []
-    piece_cell = cells.get(f'{x}-{y-1}')
-    piece = default_piece if piece_cell == None else piece_cell.filled_piece
-    if piece != None:
-        for possible_piece in cell.possibilities:
-            if possible_piece.y_bottom == piece.y_top:
-                print(f"4, {x}-{y-1}, y_bottom, y_top", possible_piece.y_bottom,
-                      piece.y_top, possible_piece.name, piece.name)
-                updated_possibilities.append(possible_piece)
-    if len(updated_possibilities) != 0:
-        cell.possibilities = updated_possibilities
+    cells = update_possibilities_for_neighbor(x+1, y, cell, cells, "1,0")
+    cells = update_possibilities_for_neighbor(x-1, y, cell, cells, "-1,0")
+    cells = update_possibilities_for_neighbor(x, y+1, cell, cells, "0,1")
+    cells = update_possibilities_for_neighbor(x, y-1, cell, cells, "0,-1")
 
     return cells
 
