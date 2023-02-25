@@ -11,6 +11,10 @@ source_modules_collection = None
 
 default_piece = None
 
+negative_z = -100
+positive_z = 100
+any_value = 555
+
 
 def initialize_grids():
     class Piece:
@@ -71,20 +75,31 @@ def update_possibilities(position, cells):
         updated_possibilities = []
         piece_cell = cells.get(f'{x_position}-{y_position}-{z_position}')
         piece = default_piece if piece_cell == None else piece_cell.filled_piece
-        if piece != None:
-            for possible_piece in current_cell.possibilities:
-                if neighbor_position == "1,0" and possible_piece.x_top == piece.x_bottom:
-                    updated_possibilities.append(possible_piece)
-                if neighbor_position == "-1,0" and possible_piece.x_bottom == piece.x_top:
-                    updated_possibilities.append(possible_piece)
-                if neighbor_position == "0,1" and possible_piece.y_top == piece.y_bottom:
-                    updated_possibilities.append(possible_piece)
-                if neighbor_position == "0,-1" and possible_piece.y_bottom == piece.y_top:
-                    updated_possibilities.append(possible_piece)
-                if neighbor_position == "+z" and possible_piece.z_top == piece.z_bottom:
-                    updated_possibilities.append(possible_piece)
-                if neighbor_position == "-z" and possible_piece.z_bottom == piece.z_top:
-                    updated_possibilities.append(possible_piece)
+        print("neighbor_position", z_position)
+
+        for possible_piece in current_cell.possibilities:
+            if neighbor_position == "1,0" and piece != None and possible_piece.x_top == piece.x_bottom:
+                updated_possibilities.append(possible_piece)
+            if neighbor_position == "-1,0" and piece != None and possible_piece.x_bottom == piece.x_top:
+                updated_possibilities.append(possible_piece)
+            if neighbor_position == "0,1" and piece != None and possible_piece.y_top == piece.y_bottom:
+                updated_possibilities.append(possible_piece)
+            if neighbor_position == "0,-1" and piece != None and possible_piece.y_bottom == piece.y_top:
+                updated_possibilities.append(possible_piece)
+            if neighbor_position == "+z" and piece != None and possible_piece.z_top == piece.z_bottom:
+                updated_possibilities.append(possible_piece)
+            if neighbor_position == "-z":
+                print("Inside -z")
+                if z_position == -1:
+                    print("z-1", possible_piece.name,
+                          possible_piece.z_bottom)
+                    if possible_piece.z_bottom == negative_z:
+                        print("Inside z -1", possible_piece.name,
+                              possible_piece.z_bottom)
+                        updated_possibilities.append(possible_piece)
+                else:
+                    if possible_piece.z_bottom == piece.z_top:
+                        updated_possibilities.append(possible_piece)
         if len(updated_possibilities) != 0:
             current_cell.possibilities = updated_possibilities
         return cells
