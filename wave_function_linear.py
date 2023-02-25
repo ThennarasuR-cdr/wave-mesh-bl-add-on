@@ -200,8 +200,5 @@ def unregister():
     del bpy.types.Scene.pro_mesh_pointer_prop
 
 
-# TODO: Remove it later
-register()
-
-# if __name__ == "__main__":
-#    register()
+if __name__ == "__main__":
+    register()
