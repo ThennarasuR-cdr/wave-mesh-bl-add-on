@@ -13,7 +13,7 @@ bl_info = {
     "doc_url": "http://wiki.blender.org/index.php/Extensions:2.6/Py/",
     "tracker_url": "https://developer.blender.org/maniphest/task/edit/form/2/",
     "support": "COMMUNITY",
-    "category": "Add Mesh",
+    "category": "3D View",
 }
 
 width = None
