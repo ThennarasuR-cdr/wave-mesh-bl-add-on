@@ -120,9 +120,9 @@ class ProMeshProperties(bpy.types.PropertyGroup):
     dimension_of_pieces: bpy.props.IntProperty(
         name="Piece Dimension", default=6)
     target_collection_name: bpy.props.StringProperty(
-        name="Target Collection name", default="Generated")
+        name="", default="Generated")
     source_collection_name: bpy.props.StringProperty(
-        name="Source Collection name", default="Modules")
+        name="", default="Modules")
 
 
 class WFMeshGeneratorUI(bpy.types.Panel):
@@ -141,7 +141,9 @@ class WFMeshGeneratorUI(bpy.types.Panel):
         layout.prop(properties, "width")
         layout.prop(properties, "depth")
         layout.prop(properties, "dimension_of_pieces")
+        layout.label(text="Source Collection name")
         layout.prop(properties, "source_collection_name")
+        layout.label(text="Target Collection name")
         layout.prop(properties, "target_collection_name")
 
         generator_row = layout.row()
