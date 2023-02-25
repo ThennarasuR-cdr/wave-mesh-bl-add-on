@@ -2,6 +2,20 @@ import random
 import bpy
 from math import radians
 
+bl_info = {
+    "name": "Mesh Generator",
+    "description": "Generate mesh using simplified wave function collapse",
+    "author": "Thennarasu, R",
+    "version": (1, 0, 0),
+    "blender": (3, 4, 1),
+    "location": "View3D > MeshGen",
+    "warning": "",  # used for warning icon and text in addons panel
+    "doc_url": "http://wiki.blender.org/index.php/Extensions:2.6/Py/",
+    "tracker_url": "https://developer.blender.org/maniphest/task/edit/form/2/",
+    "support": "COMMUNITY",
+    "category": "Add Mesh",
+}
+
 width = None
 height = None
 dimension = None
