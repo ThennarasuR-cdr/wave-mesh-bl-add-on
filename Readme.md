@@ -15,14 +15,13 @@ This addon is implemented using Python programming language and can be used on B
 ## Usage
 - Open Blender and switch to "3D View" window.
 - Press "Shift+A" to open the "Add" menu and select "Mesh".
-- From the "Mesh" submenu, select "MeshGen".
 - In the "MeshGen" panel that appears, set the desired width, height, dimension and source module collection.
 - Press the "Generate" button to generate the mesh.
 
 ## Parameters
 - Width: The number of cells in the horizontal direction.
 - Height: The number of cells in the vertical direction.
-- Dimension: The size of each cell.
+- Piece Dimension: The XY dimension of modular pieces. (expected the pieces to be a square)
 - Source module name: The name of the collection containing the modular pieces to be used for generating the mesh.
 - Target module name: The name of the collection inside which you need the generated mesh.
 
